@@ -20,7 +20,7 @@ exports.postAddProduct = (req, res, next) => {
     description: description
   })
     .then(result => {
-      //console.log(result);
+      // console.log(result);
       console.log('Created Product');
     })
     .catch(err => {
@@ -64,12 +64,12 @@ exports.postEditProduct = (req, res, next) => {
   res.redirect('/admin/products');
 };
 
-exports.getProducts =  (req, res, next) => {
-  Product.fetchAll((products) => {
+exports.getProducts = (req, res, next) => {
+  Product.fetchAll(products => {
     res.render('admin/products', {
       prods: products,
       pageTitle: 'Admin Products',
-      path: '/admin/products',
+      path: '/admin/products'
     });
   });
 };
