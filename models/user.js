@@ -18,7 +18,13 @@ class User {
     const db = getDb();
     return db
       .collection('users')
-      .findOne({ _id: new ObjectId(userId) });
+      .findOne({ _id: new ObjectId(userId) })
+      .then(user => {
+        console.log(user);
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
 }
 module.exports = User;
