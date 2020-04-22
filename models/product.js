@@ -1,3 +1,4 @@
+const mongodb = require('mongodb');
 const getDb = require('../util/database').getDb;
 
 class Product {
@@ -36,7 +37,7 @@ class Product {
       });
   }
 
-  static findyById(prodId) {
+  static findById(prodId) {
     const db = getDb();
     return db
       .collection('products')
