@@ -7,6 +7,7 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
+require('dotenv').config();
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -46,10 +47,15 @@ app.use((req, res, next) => {
   }
   User.findById(req.session.user._id)
     .then(user => {
+      if (!user) {
+        return next();
+      }
       req.user = user;
       next();
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      throw new Error(err);
+    });
 });
 
 app.use((req, res, next) => {
