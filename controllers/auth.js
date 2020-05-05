@@ -28,8 +28,8 @@ exports.getLogin = (req, res, next) => {
     oldInput: {
       email: '',
       password: '',
-      validationErrors: []
-    }
+    },
+    validationErrors: []
   });
 };
 
