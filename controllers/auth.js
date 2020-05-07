@@ -3,16 +3,18 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
-
 const { validationResult } = require('express-validator/check');
 
 const User = require('../models/user');
 
-const transporter = nodemailer.createTransport(sendgridTransport({
-  auth: {
-    api_key: ''
-  }
-}));
+const transporter = nodemailer.createTransport(
+  sendgridTransport({
+    auth: {
+      api_key:
+        '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'
+    }
+  })
+);
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash('error');
@@ -27,7 +29,7 @@ exports.getLogin = (req, res, next) => {
     errorMessage: message,
     oldInput: {
       email: '',
-      password: '',
+      password: ''
     },
     validationErrors: []
   });
@@ -45,9 +47,9 @@ exports.getSignup = (req, res, next) => {
     pageTitle: 'Signup',
     errorMessage: message,
     oldInput: {
-      email: "",
-      password: "",
-      confirmPassword: ""
+      email: '',
+      password: '',
+      confirmPassword: ''
     },
     validationErrors: []
   });
@@ -122,8 +124,8 @@ exports.postLogin = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  const errors = validationResult(req);
 
+  const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors.array());
     return res.status(422).render('auth/signup', {
@@ -139,8 +141,7 @@ exports.postSignup = (req, res, next) => {
     });
   }
 
-
-  return bcrypt
+  bcrypt
     .hash(password, 12)
     .then(hashedPassword => {
       const user = new User({
@@ -152,12 +153,12 @@ exports.postSignup = (req, res, next) => {
     })
     .then(result => {
       res.redirect('/login');
-      return transporter.sendMail({
-        to: email,
-        from: 'adam.tremblett7@gmail.com',
-        subject: 'Signup Successful',
-        html: '<h1>You successfully signed up</h1>'
-      });
+      // return transporter.sendMail({
+      //   to: email,
+      //   from: 'shop@node-complete.com',
+      //   subject: 'Signup succeeded!',
+      //   html: '<h1>You successfully signed up!</h1>'
+      // });
     })
     .catch(err => {
       const error = new Error(err);
@@ -197,7 +198,7 @@ exports.postReset = (req, res, next) => {
     User.findOne({ email: req.body.email })
       .then(user => {
         if (!user) {
-          req.flash('error', 'No account with the email found.');
+          req.flash('error', 'No account with that email found.');
           return res.redirect('/reset');
         }
         user.resetToken = token;
@@ -205,17 +206,16 @@ exports.postReset = (req, res, next) => {
         return user.save();
       })
       .then(result => {
-        //send email
         res.redirect('/');
         transporter.sendMail({
           to: req.body.email,
-          from: 'adam.tremblett7@gmail.com',
-          subject: 'Your Password Reset Request',
+          from: 'shop@node-complete.com',
+          subject: 'Password reset',
           html: `
-          <p>You requested a password reset</p>
-          <p>Click this <a href ="http://localhost:3000/reset/${token}">link</a> to set a new password
+            <p>You requested a password reset</p>
+            <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p>
           `
-        })
+        });
       })
       .catch(err => {
         const error = new Error(err);
@@ -267,7 +267,7 @@ exports.postNewPassword = (req, res, next) => {
     })
     .then(hashedPassword => {
       resetUser.password = hashedPassword;
-      resetUser.resetToken = null;
+      resetUser.resetToken = undefined;
       resetUser.resetTokenExpiration = undefined;
       return resetUser.save();
     })
@@ -279,4 +279,4 @@ exports.postNewPassword = (req, res, next) => {
       error.httpStatusCode = 500;
       return next(error);
     });
-}
+};
