@@ -8,6 +8,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
 const multer = require('multer');
+const uuidv4 = require('uuid/v4')
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -21,13 +22,14 @@ const store = new MongoDBStore({
 });
 const csrfProtection = csrf();
 
+ 
 const fileStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'images');
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname)
-  }
+    destination: function(req, file, cb) {
+        cb(null, 'images');
+    },
+    filename: function(req, file, cb) {
+        cb(null, uuidv4())
+    }
 });
 
 app.set('view engine', 'ejs');
