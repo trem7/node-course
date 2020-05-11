@@ -7,7 +7,8 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
-require('dotenv').config();
+const multer = require('multer');
+const uuidv4 = require('uuid/dist/v4')
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -21,6 +22,16 @@ const store = new MongoDBStore({
 });
 const csrfProtection = csrf();
 
+ 
+const fileStorage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, 'images');
+    },
+    filename: function(req, file, cb) {
+        cb(null, uuidv4.toString())
+    }
+});
+
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
@@ -29,7 +40,9 @@ const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({storage: fileStorage}).single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(
   session({
     secret: 'my secret',
@@ -48,6 +61,7 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
+  // throw new Error('Sync Dummy');
   if (!req.session.user) {
     return next();
   }
@@ -73,7 +87,8 @@ app.get('/500', errorController.get500);
 app.use(errorController.get404);
 
 app.use((error, req, res, next) => {
-  //res.redirect('/500');
+  // res.status(error.httpStatusCode).render(...);
+  // res.redirect('/500');
   res.status(500).render('500', {
     pageTitle: 'Error!',
     path: '/500',

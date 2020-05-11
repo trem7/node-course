@@ -10,16 +10,20 @@ router.get('/login', authController.getLogin);
 
 router.get('/signup', authController.getSignup);
 
-router.post('/login', [
-  body('email')
-    .isEmail()
-    .withMessage('Please enter a valid email address')
-    .normalizeEmail(),
-  body('password', 'Password has to be valid.')
-    .isLength({ min: 5 })
-    .isAlphanumeric()
-    .trim()
-], authController.postLogin);
+router.post(
+  '/login',
+  [
+    body('email')
+      .isEmail()
+      .withMessage('Please enter a valid email address.')
+      .normalizeEmail(),
+    body('password', 'Password has to be valid.')
+      .isLength({ min: 5 })
+      .isAlphanumeric()
+      .trim()
+  ],
+  authController.postLogin
+);
 
 router.post(
   '/signup',
@@ -29,17 +33,16 @@ router.post(
       .withMessage('Please enter a valid email.')
       .custom((value, { req }) => {
         // if (value === 'test@test.com') {
-        //   throw new Error('This email address is forbidden');
+        //   throw new Error('This email address if forbidden.');
         // }
         // return true;
-        return User.findOne({ email: value })
-          .then(userDoc => {
-            if (userDoc) {
-              return Promise.reject(
-                'E-mail exists already, please choose a different email'
-              );
-            }
-          });
+        return User.findOne({ email: value }).then(userDoc => {
+          if (userDoc) {
+            return Promise.reject(
+              'E-Mail exists already, please pick a different one.'
+            );
+          }
+        });
       })
       .normalizeEmail(),
     body(
@@ -53,12 +56,13 @@ router.post(
       .trim()
       .custom((value, { req }) => {
         if (value !== req.body.password) {
-          throw new Error('Passwords must match');
+          throw new Error('Passwords have to match!');
         }
         return true;
       })
   ],
-  authController.postSignup);
+  authController.postSignup
+);
 
 router.post('/logout', authController.postLogout);
 
